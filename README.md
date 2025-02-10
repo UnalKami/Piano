@@ -3,5 +3,4 @@ Para esta actividad de la clase de Teoría de la Información y las Telecomunica
 
 Para este caso se usó la cuarta octava de un piano con sus respectivos bemoles y se implementó usando las librerías 'tkinker' y 'winsound' instaladas por defecto en Python.
 
-Universidad Nacional de Colombia
-2025
+Universidad Nacional de Colombia.
