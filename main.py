@@ -1,5 +1,8 @@
 import tkinter as tk
 import winsound
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class notes:
     def __init__(self):
@@ -20,6 +23,20 @@ class notes:
         
     def play_note(self, note):
         winsound.Beep(int(self.frec[note]), 500)
+        self.plot_wave(note)
+
+    def plot_wave(self, note):
+        frequency = self.frec[note]
+        t = np.linspace(0, 1, 100)
+        wave = np.sin(2 * np.pi * frequency * t)
+
+        plt.figure(figsize=(10, 4))
+        plt.plot(t, wave)
+        plt.title(f"Waveform of {note}")
+        plt.xlabel("Time [s]")
+        plt.ylabel("Amplitude")
+        plt.grid(True)
+        plt.show()
 
 class app:
     def __init__(self):
