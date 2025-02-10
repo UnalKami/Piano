@@ -20,10 +20,12 @@ class notes:
             "A#4": 466.16,  # La#4 / Sib4
             "B4": 493.88    # Si4
             }
-        
+        self.plot_enabled = True
+
     def play_note(self, note):
-        winsound.Beep(int(self.frec[note]), 500)
-        self.plot_wave(note)
+        winsound.Beep(int(self.frec[note]), 1000)
+        if self.plot_enabled:
+            self.plot_wave(note)
 
     def plot_wave(self, note):
         frequency = self.frec[note]
@@ -37,6 +39,10 @@ class notes:
         plt.ylabel("Amplitude")
         plt.grid(True)
         plt.show()
+
+    def toggle_plot(self, button):
+        self.plot_enabled = not self.plot_enabled
+        button.config(text="Desactivar gráfica" if self.plot_enabled else "Activar gráfica")
 
 class app:
     def __init__(self):
@@ -61,18 +67,22 @@ class app:
 
     def draw_keys(self):
         for i, key in enumerate(self.white_keys):
-            button = tk.Button(self.window, text = key, bd = 12, width = 9, height = 18, font = ("arial", 16, "bold"))
+            button = tk.Button(self.window, text = key, bd = 12, width = 9, height = 12, font = ("arial", 16, "bold"))
             button.grid(row = 1, column = i, sticky = "nsew")
             button.config(command = lambda note = key: self.notes.play_note(note))
 
         for i, key in enumerate(self.black_keys):
-            button = tk.Button(self.window, text = key, bd = 12, width = 9, height = 12, bg = "black", fg= "white", font = ("arial", 16, "bold"))
+            button = tk.Button(self.window, text = key, bd = 12, width = 5, height = 9, bg = "black", fg= "white", font = ("arial", 16, "bold"))
             button.grid(row = 0, column = i*2, sticky = "nsew", padx = (0,2))
             button.config(command = lambda note = key: self.notes.play_note(note))
+        
+        toggle_button = tk.Button(self.window, text = "Desactivar gráfica" if self.notes.plot_enabled else "Activar gráfica", command = lambda: self.notes.toggle_plot(toggle_button))
+        toggle_button.grid(row = 2, columnspan = 7, sticky = "nsew")
 
         self.window.title("TeoInfo Piano")
         self.window.grid_rowconfigure(0, weight = 1)
         self.window.grid_rowconfigure(1, weight = 1)
+        self.window.grid_rowconfigure(2, weight = 1)
         self.window.grid_columnconfigure(list(range(1, 16, 21)), weight = 1)
 
         self.window.bind("<KeyPress>", self.on_key_press)
@@ -82,7 +92,6 @@ class app:
         note = self.key_mapping.get(event.char)
         if note:
             self.notes.play_note(note)
-
     
 if __name__ == "__main__":
     app = app()
