@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class notes:
-    def __init__(self):
+    def __init__(self, parent):
         self.frec = {
             "C4": 261.63,   # Do4
             "C#4": 277.18,  # Do#4 / Reb4
@@ -21,24 +21,28 @@ class notes:
             "B4": 493.88    # Si4
             }
         self.plot_enabled = True
+        self.frequencies = []
+        self.fig, self.ax = plt.subplots(figsize=(10, 4))
+        self.canvas = FigureCanvasTkAgg(self.fig, master=parent)
+        self.canvas.get_tk_widget().grid(row=3, columnspan=7, sticky="nsew")
 
     def play_note(self, note):
         winsound.Beep(int(self.frec[note]), 1000)
         if self.plot_enabled:
-            self.plot_wave(note)
+            self.frequencies.append(self.frec[note])
+            self.plot_wave()
 
-    def plot_wave(self, note):
-        frequency = self.frec[note]
-        t = np.linspace(0, 1, 100)
-        wave = np.sin(2 * np.pi * frequency * t)
+    def plot_wave(self):
+        t = np.linspace(0, len(self.frequencies), 100 * len(self.frequencies))
+        wave = np.concatenate([np.sin(2 * np.pi * freq * t[i*100:(i+1)*100]) for i, freq in enumerate(self.frequencies)])
 
-        plt.figure(figsize=(10, 4))
-        plt.plot(t, wave)
-        plt.title(f"Waveform of {note}")
-        plt.xlabel("Time [s]")
-        plt.ylabel("Amplitude")
-        plt.grid(True)
-        plt.show()
+        self.ax.clear()  # Limpiar el eje antes de volver a dibujar
+        self.ax.plot(t, wave)
+        self.ax.set_title("Waveform of Played Notes")
+        self.ax.set_xlabel("Time [s]")
+        self.ax.set_ylabel("Amplitude")
+        self.ax.grid(True)
+        self.canvas.draw()
 
     def toggle_plot(self, button):
         self.plot_enabled = not self.plot_enabled
@@ -47,7 +51,7 @@ class notes:
 class app:
     def __init__(self):
         self.window = tk.Tk()
-        self.notes = notes()
+        self.notes = notes(self.window)
         self.white_keys = ["C4","D4","E4","F4","G4","A4","B4"]
         self.black_keys = ["C#4","D#4","F#4","G#4","A#4"]   
         self.key_mapping = {
